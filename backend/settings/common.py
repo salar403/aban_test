@@ -16,9 +16,6 @@ from backend.environments import (
     REDIS_COIN_INFO,
     REDIS_DEFAULT,
     REDIS_KEYS,
-    REDIS_MANAGEMENT,
-    REDIS_OTP,
-    REDIS_PASSWORD_TRY,
     REDIS_RATELIMIT,
     REDIS_TOKENS,
     REDIS_CHANNEL_LAYER,
@@ -101,20 +98,6 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     },
-    "otp": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{BACKEND_REDIS_HOST}:{BACKEND_REDIS_PORT}/{REDIS_OTP}",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    },
-    "management": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{BACKEND_REDIS_HOST}:{BACKEND_REDIS_PORT}/{REDIS_MANAGEMENT}",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    },
     "ratelimit": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": f"redis://{BACKEND_REDIS_HOST}:{BACKEND_REDIS_PORT}/{REDIS_RATELIMIT}",
@@ -132,13 +115,6 @@ CACHES = {
     "keys": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": f"redis://{BACKEND_REDIS_HOST}:{BACKEND_REDIS_PORT}/{REDIS_KEYS}",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-    },
-    "passrate": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{BACKEND_REDIS_HOST}:{BACKEND_REDIS_PORT}/{REDIS_PASSWORD_TRY}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
