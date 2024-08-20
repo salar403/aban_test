@@ -50,3 +50,45 @@ class FiatAsset(Asset):
 
 class StableAsset(CryptoAsset):
     is_main = models.BooleanField(default=False)
+
+
+class StableAssetPrice(models.Model):
+    stable_asset = models.ForeignKey(
+        to=StableAsset,
+        on_delete=models.CASCADE,
+        related_name="price",
+        null=False,
+    )
+    fiat_asset = models.ForeignKey(
+        to=FiatAsset,
+        on_delete=models.CASCADE,
+        related_name="stable_coins",
+        null=False,
+    )
+    price = models.BigIntegerField(null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("stable_asset", "fiat_asset")
+
+
+class AssetPair(models.Model):
+    base_asset = models.ForeignKey(
+        to=Asset,
+        on_delete=models.CASCADE,
+        related_name="quote_assets",
+        null=False,
+    )
+    quote_asset = models.ForeignKey(
+        to=Asset,
+        on_delete=models.CASCADE,
+        related_name="base_assets",
+        null=False,
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("base_asset", "quote_asset")
