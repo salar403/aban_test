@@ -145,7 +145,7 @@ class Order(models.Model):
     )
     amount = models.DecimalField(max_digits=40, decimal_places=20, null=False)
     side = models.IntegerField(choices=SIDES, null=False)
-    status = models.IntegerField(choices=STATE_CHOICES, null=False)
+    status = models.IntegerField(choices=STATE_CHOICES, default=CREATED, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
