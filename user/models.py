@@ -45,6 +45,13 @@ class User(models.Model):
         ).hash(password)
         return hashed_password
 
+    @property
+    def is_system_user(self) -> bool:
+        try:
+            system_user = self.systemuser
+            return True
+        except SystemUser.DoesNotExist:
+            return False
 
 class SystemUser(models.Model):
 

@@ -1,11 +1,12 @@
 from decimal import Decimal
 from django.db import transaction
+from django.db.models import Sum
 from accounting.models import Portfo
 from backend.customs.exceptions import CustomException
 from exchange.models import AssetPair, Exchange, ExchangeOrder, MockOrder, Order
 from accounting.services.portfo_manager import PortfoManager
 from exchange.services.exchange_manager import BaseExchangeManager, get_exchange_manager
-from user.models import User
+from user.models import SystemUser, User
 
 
 class BaseOrderManager:
@@ -41,7 +42,7 @@ class BaseOrderManager:
         ).get_asset_price(asset_pair_symbol=self.asset_pair.symbol)
         self.value = self.price * self.amount
 
-    def block_portfolio(self):
+    def block_portfo(self):
         if self.side == Order.BUY:
             PortfoManager(portfo=self.quote_portfo).block_balance(
                 amount=self.value, description="blockd for buy order"
@@ -53,8 +54,6 @@ class BaseOrderManager:
 
 
 class OrderRequestManager(BaseOrderManager):
-    def __init__(self) -> None:
-        super().__init__()
 
     def create_order(
         self,
@@ -71,7 +70,7 @@ class OrderRequestManager(BaseOrderManager):
             self.setup_portfo()
             self.setup_exchange()
             self.predict_order_value()
-            self.block_portfolio()
+            self.block_portfo()
             return Order.objects.create(
                 user=user,
                 asset_pair=asset_pair,
@@ -81,6 +80,9 @@ class OrderRequestManager(BaseOrderManager):
 
 
 class OrderManager(BaseOrderManager):
+    def __init__(self) -> None:
+        super().__init__()
+        self.order = None
 
     def mock_order(self):
         MockOrder.objects.create(order=self.order, value=self.value)
@@ -117,7 +119,7 @@ class OrderManager(BaseOrderManager):
                 description="removed affter buy order",
             )
 
-    def process_order(self, order:Order):
+    def process_order(self, order: Order):
         self.order = order
         self.user = order.user
         self.asset_pair = order.asset_pair
@@ -128,7 +130,7 @@ class OrderManager(BaseOrderManager):
             self.setup_portfo()
             self.setup_exchange()
             self.predict_order_value()
-            self.block_portfolio()
+            self.block_portfo()
             if self.value >= self.order.asset_pair.min_order_value:
                 result = self.exchange_manager.submit_market_order(
                     asset_symbol=self.order.asset_pair.symbol,
@@ -143,3 +145,40 @@ class OrderManager(BaseOrderManager):
             self.release_blocked()
             order.status = Order.SUCCESS
             order.save()
+
+
+class MockOrderManager(BaseOrderManager):
+    def __init__(self) -> None:
+        super().__init__()
+        self.aggregated_order = None
+
+    def create_aggregated_order(self):
+        self.aggregated_order = Order.objects.create(
+            user=SystemUser.object().user,
+            asset_pair=self.asset_pair,
+            amount=self.amount if self.side == MockOrder.SELL else self.value,
+            side=self.side,
+        )
+
+    def aggregate_orders(self, order: MockOrder):
+        self.asset_pair = order.asset_pair
+        self.side = order.side
+        with transaction.atomic():
+            waiting_mock_orders = MockOrder.objects.select_for_update().filter(
+                asset_pair=order.asset_pair,
+                mock_state=MockOrder.WAITING_FOR_MORE,
+                side=MockOrder.side,
+            )
+            aggregated_data = waiting_mock_orders.aggregate(
+                sum_amount=Sum("amount"), sum_value=Sum("value")
+            )
+            self.amount = aggregated_data["sum_amount"]
+            self.value = aggregated_data["sum_value"]
+            self.predict_order_value()
+            if self.value >= self.asset_pair.min_order_value:
+                self.create_aggregated_order()
+                for order in waiting_mock_orders:
+                    order.mock_state = MockOrder.DONE
+                    order.aggregated_order = self.aggregated_order
+                    order.save()
+                OrderManager().process_order(order=self.aggregated_order)
