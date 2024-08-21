@@ -29,21 +29,22 @@ class NewMarketOrderSerializer(serializers.Serializer):
         return asset_pair
 
     def validate_side(self, side: int):
-        if side not in dict(Order.SIDES).keys():
+        if side not in dict(map(reversed, dict(Order.SIDES).items())):
             raise CustomException(code="invalid side")
         return side
 
     def validate_amount(self, amount):
         if amount == Decimal(0):
             raise CustomException(code="invalid_amount")
+        return Decimal(amount)
 
     def create(self, validated_data):
         order = OrderRequestManager().create_order(
-            user=self.context["request"].user,
+            user=self.context["request"].client,
             asset_pair=validated_data["asset_pair"],
             amount=validated_data["amount"],
             side=validated_data["side"],
         )
-        process_order.apply_async(queue="order", args=(order.id))
+        process_order.apply_async(queue="order", kwargs={"order_id": order.id})
         self._data = {"code": "success", "order_id": order.id}
         return True

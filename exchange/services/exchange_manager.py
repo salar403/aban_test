@@ -22,9 +22,7 @@ class BaseExchangeManager(ABC):
         )
 
     def get_asset_price(self, asset_pair_symbol) -> Decimal:
-        return self.outbound(exchange=self.exchange).get_asset_price(
-            symbol=asset_pair_symbol
-        )
+        return self.outbound.get_asset_price(symbol=asset_pair_symbol)
 
 
 class AbanExchangeManager(BaseExchangeManager):

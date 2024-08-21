@@ -40,6 +40,7 @@ class PortfoManager:
         allow_negative: bool = False,
         bypass_system_user: bool = True,
     ):
+        amount = Decimal(amount)
         if bypass_system_user and self.portfo.user.is_system_user:
             return
         with transaction.atomic():
@@ -66,6 +67,7 @@ class PortfoManager:
         description: str,
         bypass_system_user: bool = True,
     ):
+        amount = Decimal(amount)
         if bypass_system_user and self.portfo.user.is_system_user:
             return
         with transaction.atomic():
@@ -87,6 +89,7 @@ class PortfoManager:
         allow_negative: bool = False,
         bypass_system_user: bool = True,
     ):
+        amount = Decimal(amount)
         if bypass_system_user and self.portfo.user.is_system_user:
             return
         with transaction.atomic():

@@ -85,7 +85,16 @@ class OrderManager(BaseOrderManager):
         self.order = None
 
     def mock_order(self):
-        MockOrder.objects.create(order=self.order, value=self.value)
+        MockOrder.objects.create(
+            id=self.order.id,
+            user=self.order.user,
+            asset_pair=self.order.asset_pair,
+            amount=self.order.amount,
+            side=self.order.side,
+            status=self.order.status,
+            value=self.value,
+            created_at=self.order.created_at,
+        )
         return {}
 
     def create_exchange_order(self, result: dict):
@@ -103,7 +112,8 @@ class OrderManager(BaseOrderManager):
             )
         else:
             PortfoManager(portfo=self.base_portfo).add_balance(
-                amount=self.value / self.order.amount, description="added for buy order"
+                amount=Decimal(self.value) / self.order.amount,
+                description="added for buy order",
             )
 
     def release_blocked(self):
@@ -123,6 +133,7 @@ class OrderManager(BaseOrderManager):
         self.order = order
         self.user = order.user
         self.asset_pair = order.asset_pair
+        self.amount = order.amount
         with transaction.atomic():
             order = Order.objects.select_for_update().get(id=self.order.id)
             if order.status != Order.PROCESSING:
@@ -130,9 +141,10 @@ class OrderManager(BaseOrderManager):
             self.setup_portfo()
             self.setup_exchange()
             self.predict_order_value()
-            self.block_portfo()
             if self.value >= self.order.asset_pair.min_order_value:
-                result = self.exchange_manager.submit_market_order(
+                result = self.exchange_manager(
+                    exchange=self.exchange
+                ).submit_market_order(
                     asset_symbol=self.order.asset_pair.symbol,
                     amount=self.order.amount,
                     side=self.order.side,
@@ -154,7 +166,7 @@ class MockOrderManager(BaseOrderManager):
 
     def create_aggregated_order(self):
         self.aggregated_order = Order.objects.create(
-            user=SystemUser.object().user,
+            user=SystemUser.object(),
             asset_pair=self.asset_pair,
             amount=self.amount if self.side == MockOrder.SELL else self.value,
             side=self.side,
@@ -163,11 +175,12 @@ class MockOrderManager(BaseOrderManager):
     def aggregate_orders(self, order: MockOrder):
         self.asset_pair = order.asset_pair
         self.side = order.side
+        self.setup_exchange()
         with transaction.atomic():
             waiting_mock_orders = MockOrder.objects.select_for_update().filter(
                 asset_pair=order.asset_pair,
-                mock_state=MockOrder.WAITING_FOR_MORE,
-                side=MockOrder.side,
+                mock_status=MockOrder.WAITING_FOR_MORE,
+                side=order.side,
             )
             aggregated_data = waiting_mock_orders.aggregate(
                 sum_amount=Sum("amount"), sum_value=Sum("value")
@@ -178,7 +191,7 @@ class MockOrderManager(BaseOrderManager):
             if self.value >= self.asset_pair.min_order_value:
                 self.create_aggregated_order()
                 for order in waiting_mock_orders:
-                    order.mock_state = MockOrder.DONE
+                    order.mock_status = MockOrder.DONE
                     order.aggregated_order = self.aggregated_order
                     order.save()
                 return self.aggregated_order

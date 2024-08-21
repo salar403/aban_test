@@ -7,7 +7,7 @@ from exchange.serializers.order import NewMarketOrderSerializer
 
 
 class NewMarketOrder(CreateApiView):
-    parser_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
     serializer_class = NewMarketOrderSerializer
     context_map = {"request": None}
     response_code = status.HTTP_201_CREATED
