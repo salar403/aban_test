@@ -44,9 +44,6 @@ class CryptoAsset(Asset):
     buy = models.BooleanField(default=True)
     sell = models.BooleanField(default=True)
     order_market = models.BooleanField(default=True)
-    exchange = models.ForeignKey(
-        to=Exchange, on_delete=models.CASCADE, null=False, related_name="coins"
-    )
 
 
 class FiatAsset(Asset):
@@ -91,6 +88,14 @@ class AssetPair(models.Model):
         related_name="base_assets",
         null=False,
     )
+    exchange = models.ForeignKey(
+        to=Exchange,
+        on_delete=models.CASCADE,
+        null=False,
+        related_name="pairs",
+    )
+    min_order_value = models.DecimalField(max_digits=40, decimal_places=20, null=True)
+    max_order_value = models.DecimalField(max_digits=40, decimal_places=20, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
