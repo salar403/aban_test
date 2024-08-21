@@ -181,4 +181,4 @@ class MockOrderManager(BaseOrderManager):
                     order.mock_state = MockOrder.DONE
                     order.aggregated_order = self.aggregated_order
                     order.save()
-                OrderManager().process_order(order=self.aggregated_order)
+                return self.aggregated_order
