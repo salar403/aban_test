@@ -46,6 +46,17 @@ class User(models.Model):
         return hashed_password
 
 
+class SystemUser(models.Model):
+
+    @classmethod
+    def object(cls):
+        return cls._default_manager.all().first()  # Since only one item
+
+    def save(self, *args, **kwargs):
+        if not self.pk and SystemUser.objects.exists():
+            raise CustomException(code="duplicated user")
+
+
 class Session(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="sessions")
     token_id = models.BigIntegerField(null=False)
