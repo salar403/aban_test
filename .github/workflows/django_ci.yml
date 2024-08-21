@@ -44,7 +44,7 @@ jobs:
       run: |
         python ./manage.py makemigrations
         python ./manage.py migrate
-        python ./manage.py submit_test_data 32500 32000
+        python ./manage.py submit_test_data
 
     - name: Run Tests
       env:
