@@ -1,0 +1,24 @@
+version: '3.3'
+
+services:
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    environment:
+      BACKEND_REDIS_HOST: "redis-backend"
+      BACKEND_POSTGRES_HOST: "postgres-backend"
+      BACKEND_POSTGRES_NAME: "postgres"
+      BACKEND_POSTGRES_USERNAME: "postgres"
+      BACKEND_POSTGRES_PASSWORD: "postgres"
+      PLATFORM: "production"
+    command: bash -c " python3 manage.py migrate && uvicorn backend.asgi:application --host 0.0.0.0 --port 8080 --workers 2"
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    external: True

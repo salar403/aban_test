@@ -1,0 +1,60 @@
+version: '3.3'
+
+services:
+  celery-default:
+    container_name: celery-default
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    environment:
+      BACKEND_REDIS_HOST: "redis-backend"
+      BACKEND_POSTGRES_HOST: "postgres-backend"
+      BACKEND_POSTGRES_NAME: "postgres"
+      BACKEND_POSTGRES_USERNAME: "postgres"
+      BACKEND_POSTGRES_PASSWORD: "postgres"
+      PLATFORM: "production"
+    command: celery -A backend worker -l info -c 2 -Q default
+    networks:
+      - backend-network
+
+  celery-orders:
+    container_name: celery-orders
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    environment:
+      BACKEND_REDIS_HOST: "redis-backend"
+      BACKEND_POSTGRES_HOST: "postgres-backend"
+      BACKEND_POSTGRES_NAME: "postgres"
+      BACKEND_POSTGRES_USERNAME: "postgres"
+      BACKEND_POSTGRES_PASSWORD: "postgres"
+      PLATFORM: "production"
+    command: celery -A backend worker -l info -c 2 -Q order
+    networks:
+      - backend-network
+
+  celery-beat:
+    container_name: celery-beat
+    build:
+      context: '.'
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    environment:
+      BACKEND_REDIS_HOST: "redis-backend"
+      BACKEND_POSTGRES_HOST: "postgres-backend"
+      BACKEND_POSTGRES_NAME: "postgres"
+      BACKEND_POSTGRES_USERNAME: "postgres"
+      BACKEND_POSTGRES_PASSWORD: "postgres"
+      PLATFORM: "production"
+    command: celery -A backend beat -l info
+    depends_on:
+      - celery-default
+      - celery-order
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    external: True
