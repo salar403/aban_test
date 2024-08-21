@@ -31,7 +31,8 @@ class LockedKeyException(CustomException):
 
 
 class InsufficientBalance(CustomException):
-    default_code = "موجودی ناکافی"
+    default_code = "insufficient_balance"
+
 
 class InsufficientBlocked(CustomException):
-    default_code = "بلوکه ناکافی"
+    default_code = "insufficient_blocked"
