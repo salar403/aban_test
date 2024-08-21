@@ -32,5 +32,6 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("user/", include("user.urls")),
+    path("exchange/", include("exchange.urls")),
     re_path(r"^static/(?P<path>.*)$", return_static, name="static"),  #  add this line
 ]
