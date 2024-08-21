@@ -59,9 +59,10 @@ class SystemUser(User):
     def object(cls):
         return cls._default_manager.all().first()  # Since only one item
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if not self.pk and SystemUser.objects.exists():
             raise CustomException(code="duplicated user")
+        return super().save(*args, **kwargs)
 
 
 class Session(models.Model):
