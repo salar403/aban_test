@@ -1,0 +1,37 @@
+#django ver
+Django==4.0.8
+
+#django utilities
+django-cors-headers==3.13.0
+djangorestframework==3.13.1
+
+#celery
+celery==5.2.7
+
+#websocket
+channels==3.0.5
+channels-redis==3.4.0
+websockets==10.3
+
+#web handlers
+uvicorn==0.18.2
+
+#exception monitoring
+sentry-sdk==1.11.1
+
+#security & encryption
+passlib==1.7.4
+
+#swagger
+drf-yasg==1.20.0
+
+#outbounds
+requests==2.28.1
+
+#databases
+
+#redis
+django-redis==5.2.0
+
+#postgres
+psycopg2-binary==2.9.3
