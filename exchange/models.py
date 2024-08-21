@@ -32,8 +32,6 @@ class Asset(models.Model):
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-    trade_fee = models.DecimalField(null=False, max_digits=10, decimal_places=5)
-    global_fee = models.DecimalField(null=False, max_digits=10, decimal_places=5)
 
     def __str__(self):
         return self.symbol
@@ -67,7 +65,7 @@ class StableAssetPrice(models.Model):
         related_name="stable_coins",
         null=False,
     )
-    price = models.BigIntegerField(null=False)
+    price = models.DecimalField(max_digits=40, decimal_places=20, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 

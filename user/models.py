@@ -52,7 +52,8 @@ class User(models.Model):
         except SystemUser.DoesNotExist:
             return False
 
-class SystemUser(models.Model):
+
+class SystemUser(User):
 
     @classmethod
     def object(cls):
