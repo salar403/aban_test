@@ -3,7 +3,7 @@ from rest_framework import status
 from backend.customs.views import CreateApiView
 
 from backend.customs.permissions import IsAuthenticated
-from exchange.serializers.trade import NewMarketOrderSerializer
+from exchange.serializers.order import NewMarketOrderSerializer
 
 
 class NewMarketOrder(CreateApiView):
