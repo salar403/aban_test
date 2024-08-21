@@ -1,34 +1,16 @@
-import json
 from celery import shared_task
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
-from django.core.cache import caches
+from django.db import transaction
 
 from backend.customs.decorators import locked_process
-
-coin_info_cache = caches["coin_info"]
-
-
-@shared_task
-@locked_process(expire_time=3)
-def update_coin_price(price_map: dict):
-    return price_map
-
-
-def get_or_set_websocket_price():
-    return {}
+from exchange.models import Order
+from exchange.services.order_manager import OrderManager
 
 
 @shared_task
 @locked_process(expire_time=5 * 60)
-def send_socket_price():
-    channel_layer = get_channel_layer()
-    price_map = get_or_set_websocket_price()
-    async_to_sync(channel_layer.group_send)(
-        "coins_data",
-        {
-            "type": "send_price",
-            "data": json.dumps(price_map),
-        },
-    )
+def process_order(order_id: int):
+    with transaction.atomic():
+        order = Order.objects.select_for_update().get(id=order_id, status=Order.CREATED)
+        order.status = Order.PROCESSING
+        order.save()
+        OrderManager().process_order(order=order)
