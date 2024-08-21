@@ -18,8 +18,8 @@ services:
     networks:
       - backend-network
 
-  celery-orders:
-    container_name: celery-orders
+  celery-order:
+    container_name: celery-order
     build:
       context: '.'
       dockerfile: ./Dockerfile
