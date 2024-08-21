@@ -19,7 +19,7 @@ jobs:
       postgres:
         image: postgres:14.4
         env:
-          POSTGRES_DB: alinance
+          POSTGRES_DB: aban
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
