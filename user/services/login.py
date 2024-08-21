@@ -3,7 +3,7 @@ import time, json, random, hmac, base64, secrets
 
 from django.core.cache import caches
 
-from backend.customs.paginator import get_object_or_none
+from backend.customs.utils import get_object_or_none
 
 from backend.environments import CLIENT_TYPE, KEY_ID, TOKEN_ID, USER_CLIENT_TYPE
 from backend.settings import USER_TOKEN_TIMEVALID, TOKEN_KEY_TIMEVALID

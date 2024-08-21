@@ -25,5 +25,13 @@ class CustomException(APIException):
 class LockException(CustomException):
     pass
 
+
 class LockedKeyException(CustomException):
     pass
+
+
+class InsufficientBalance(CustomException):
+    default_code = "موجودی ناکافی"
+
+class InsufficientBlocked(CustomException):
+    default_code = "بلوکه ناکافی"

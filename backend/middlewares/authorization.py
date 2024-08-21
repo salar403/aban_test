@@ -9,7 +9,7 @@ from django.core.cache import caches
 from user.models import User
 
 from backend.settings import AUTH_TOKEN_PERFIX
-from backend.customs.paginator import get_object_or_none
+from backend.customs.utils import get_object_or_none
 from backend.environments import (
     CLIENT_TYPES,
     PAYLOAD_PARAMETERS,
