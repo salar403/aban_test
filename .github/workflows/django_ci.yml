@@ -47,7 +47,5 @@ jobs:
         python ./manage.py submit_test_data
 
     - name: Run Tests
-      env:
-        PLATFORM: "ci/cd"
       run: |
         python ./manage.py test */tests/
