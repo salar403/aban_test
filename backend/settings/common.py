@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     "user",
     "exchange",
     "accounting",
-    "report",
-    "trade",
     "rest_framework",
     "drf_yasg",
     "django.contrib.auth",
