@@ -11,6 +11,8 @@ services:
       PGADMIN_LISTEN_PORT: "15432"
     ports:
       - "127.0.0.1:15432:15432"
+    networks:
+      - backend-network
 
   postgres:
     image: postgres:14.4
@@ -24,6 +26,8 @@ services:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "127.0.0.1:5432:5432"
+    networks:
+      - backend-network
 
   redis:
     image: redis:6.2.7
@@ -33,7 +37,8 @@ services:
       - redis-data:/data
     ports:
       - '127.0.0.1:6379:6379'
-
+    networks:
+      - backend-network
 
 volumes:
   postgres-data:
