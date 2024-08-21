@@ -34,8 +34,14 @@ class PortfoManager:
         )
 
     def block_balance(
-        self, amount: Decimal, description: str, allow_negative: bool = False
+        self,
+        amount: Decimal,
+        description: str,
+        allow_negative: bool = False,
+        bypass_system_user: bool = True,
     ):
+        if bypass_system_user and self.portfo.user.is_system_user:
+            return
         with transaction.atomic():
             portfo = Portfo.objects.select_for_update().get(id=self.portfo.id)
             if portfo.balance - amount < 0 and not allow_negative:
@@ -54,7 +60,14 @@ class PortfoManager:
             portfo.blocked += amount
             portfo.save()
 
-    def add_balance(self, amount: Decimal, description: str):
+    def add_balance(
+        self,
+        amount: Decimal,
+        description: str,
+        bypass_system_user: bool = True,
+    ):
+        if bypass_system_user and self.portfo.user.is_system_user:
+            return
         with transaction.atomic():
             portfo = Portfo.objects.select_for_update().get(id=self.portfo.id)
             self.create_transaction(
@@ -68,8 +81,14 @@ class PortfoManager:
             portfo.save()
 
     def remove_blocked(
-        self, amount: Decimal, description: str, allow_negative: bool = False
+        self,
+        amount: Decimal,
+        description: str,
+        allow_negative: bool = False,
+        bypass_system_user: bool = True,
     ):
+        if bypass_system_user and self.portfo.user.is_system_user:
+            return
         with transaction.atomic():
             portfo = Portfo.objects.select_for_update().get(id=self.portfo.id)
             self.create_transaction(
