@@ -11,7 +11,7 @@ from backend.settings import USER_TOKEN_TIMEVALID, TOKEN_KEY_TIMEVALID
 from user.models import User
 
 token_key_cache = caches["keys"]
-user_token_cache = caches["tokens"]
+token_cache = caches["tokens"]
 
 
 class LoginManager:
@@ -38,7 +38,7 @@ class LoginManager:
     ) -> dict:
         key_id, token_key = self.generate_new_key()
         token_id = random.randint(1, 100000000)
-        while user_token_cache.get(token_id) or not user_token_cache.add(
+        while token_cache.get(token_id) or not token_cache.add(
             token_id, user.id, timevalid
         ):
             token_id = random.randint(1, 100000000)
@@ -50,7 +50,7 @@ class LoginManager:
         }
 
     def logout_user(self, user: User, token_id: int) -> bool:
-        if user_token_cache.delete(token_id):
+        if token_cache.delete(token_id):
             in_db_token = get_object_or_none(
                 user.sessions, is_active=True, token_id=token_id
             )

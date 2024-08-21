@@ -18,8 +18,7 @@ from backend.environments import (
     CLIENT_TYPE,
 )
 
-user_token_cache = caches["tokens"]
-admin_token_cache = caches["admin_tokens"]
+token_cache = caches["tokens"]
 key_cache = caches["keys"]
 
 
@@ -61,7 +60,7 @@ class CustomAuthorization(MiddlewareMixin):
     def validate_client(
         self, request: object, token_info: dict, payload: str, signature: str
     ):
-        user_id = user_token_cache.get(token_info[TOKEN_ID])
+        user_id = token_cache.get(token_info[TOKEN_ID])
         if not user_id:
             return self.reject()
         key = key_cache.get(token_info[KEY_ID])
@@ -72,6 +71,7 @@ class CustomAuthorization(MiddlewareMixin):
             if not user:
                 return self.reject()
             request.client = user
+            request.token_id = token_info[TOKEN_ID]
 
     def process_request(self, request):
         token = request.headers.get("Authorization")
