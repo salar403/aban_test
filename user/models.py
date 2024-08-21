@@ -14,7 +14,6 @@ from backend.settings import (
 
 class User(models.Model):
     phone_number = models.CharField(max_length=11, unique=True, null=False)
-    email = models.EmailField(max_length=150, unique=True, null=True)
     name = models.CharField(max_length=100, null=True)
     password = models.CharField(max_length=500, null=True)
     banned = models.BooleanField(default=False)
