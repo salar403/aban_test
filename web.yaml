@@ -9,8 +9,8 @@ services:
       dockerfile: ./Dockerfile
     restart: unless-stopped
     environment:
-      BACKEND_REDIS_HOST: "redis-backend"
-      BACKEND_POSTGRES_HOST: "postgres-backend"
+      BACKEND_REDIS_HOST: "redis"
+      BACKEND_POSTGRES_HOST: "postgres"
       BACKEND_POSTGRES_NAME: "postgres"
       BACKEND_POSTGRES_USERNAME: "postgres"
       BACKEND_POSTGRES_PASSWORD: "postgres"
