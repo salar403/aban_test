@@ -45,3 +45,7 @@ volumes:
     external: True
   redis-data:
     external: True
+
+networks:
+  backend-network:
+    external: True
